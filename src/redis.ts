@@ -30,5 +30,4 @@ export async function startRedisPubSubServer(): Promise<void> {
 
 export async function sendToServer(message: BiosphereMessage): Promise<void> {
     await (await createRedisClient()).publish(env.BIOSPHERE_REDIS_CHANNEL_TO_SERVER, messageToJson(message));
-    console.log("Sent to server", message);
 }
