@@ -2,6 +2,7 @@ import { env, RedisClient } from "bun";
 import { sendToClient } from "./ws";
 import { jsonToMessage, messageToJson, type BiosphereMessage } from "./message";
 import { freeze } from "./utils/freeze";
+import { scheduler } from "./scheduling";
 
 export async function createRedisClient(): Promise<RedisClient> {
     const redis = new RedisClient(`redis://${env.REDIS_HOST}:${env.REDIS_PORT}`, {
@@ -20,7 +21,18 @@ export async function startRedisPubSubServer(): Promise<void> {
     console.info("(Biosphere Redis P/S): Starting...")
     const redis = await createRedisClient();
     await redis.subscribe(env.BIOSPHERE_REDIS_CHANNEL_FROM_SERVER, (json: string): void => {
-        sendToClient(jsonToMessage(json));
+        const message: BiosphereMessage = jsonToMessage(json);
+        if (scheduler.isSchedule(message)) {
+            scheduler.schedule(message);
+            return;
+        }
+
+        if (scheduler.isCancellation(message)) {
+            scheduler.cancel(message.cancel);
+            return;
+        }
+
+        sendToClient(message);
     });
 
     await freeze();
