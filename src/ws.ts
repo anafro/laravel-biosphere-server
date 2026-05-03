@@ -116,5 +116,4 @@ export async function startWebsocketServer(): Promise<void> {
 
 export function sendToClient(message: BiosphereMessage): void {
     websocketServer.publish(message.channel, messageToJson(message));
-    console.log("Sent to client", message);
 }
