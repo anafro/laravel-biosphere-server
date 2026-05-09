@@ -1,5 +1,6 @@
 {
-    "name": "@anf/biosphere",
+    "name": "@laravel-biosphere/proxy",
+    "version": "0.0.0-rc",
     "module": "index.ts",
     "type": "module",
     "private": true,
